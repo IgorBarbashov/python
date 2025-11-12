@@ -10,7 +10,7 @@ class Operator(StrEnum):
     DIVIDE = "/"
 
 
-def validate_operation(a: float, op: Operator, b: float):
+def validate_operation(a: float, op: str, b: float):
     if op not in Operator:
         raise HTTPException(status_code=400, detail="Unsupported operation")
     if op == Operator.DIVIDE and b == 0:
@@ -54,5 +54,5 @@ def calculate_operation(a: float, op: str, b: float) -> float:
 
 
 @app.get("/calculate/expression/{expression}")
-def calculate_operation(expression: str) -> float:
+def calculate_expression(expression: str) -> float:
     return eval_expression(expression)
