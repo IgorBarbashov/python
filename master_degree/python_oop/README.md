@@ -17,4 +17,5 @@
 
 Урок 3
 - [паттерн Singletone](singletone.py)
-- []()
+- [использование slots в классах](slots.py)
+- [пример использования iterator](iterator.py)
