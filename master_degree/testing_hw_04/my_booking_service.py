@@ -1,10 +1,7 @@
-# booking_service.py
-
 import datetime
 
-from booking_middleware import booking_middleware
+from my_booking_middleware import my_booking_middleware
 
-# Упрощенная «база» мероприятий
 EVENTS_DB = {
     1: {
         "title": "Football Match",
@@ -23,16 +20,11 @@ EVENTS_DB = {
     },
 }
 
-# Упрощенная «база» бронирований (хранилище в памяти)
 BOOKINGS_DB = {}
 
 
-@booking_middleware
+@my_booking_middleware
 def create_booking(event_id: int, user_id: int) -> dict:
-    """
-    Создает бронь на мероприятие event_id для пользователя user_id.
-    Возвращает словарь с данными о брони или выбрасывает ValueError при ошибках.
-    """
     if event_id not in EVENTS_DB:
         raise ValueError(f"Event with id={event_id} does not exist.")
 
@@ -40,10 +32,8 @@ def create_booking(event_id: int, user_id: int) -> dict:
     if event_info["available_seats"] <= 0:
         raise ValueError("No available seats.")
 
-    # Условная логика — уменьшаем кол-во доступных мест
     event_info["available_seats"] -= 1
 
-    # Генерируем booking_id (например, текущее время + user_id)
     booking_id = f"{int(datetime.datetime.now().timestamp())}_{user_id}"
 
     BOOKING_DATA = {
@@ -54,39 +44,18 @@ def create_booking(event_id: int, user_id: int) -> dict:
         "date": event_info["date"],
         "created_at": datetime.datetime.now(),
     }
-    # Сохраняем в словарь (как базу данных)
     BOOKINGS_DB[booking_id] = BOOKING_DATA
-
     return BOOKING_DATA
 
 
-@booking_middleware
+@my_booking_middleware
 def get_booking(booking_id: str) -> dict:
-    """
-    Возвращает данные о конкретной брони по booking_id.
-    Поднимает KeyError, если брони нет.
-    """
     return BOOKINGS_DB[booking_id]
 
 
-# Пример использования (для теста)
 if __name__ == "__main__":
-    # Попробуем создать бронь
     booking = create_booking(event_id=1, user_id=101)
     print("Created booking:", booking)
 
-    # И получить ее
     retrieved = get_booking(booking["booking_id"])
     print("Retrieved booking:", retrieved)
-
-    # Пример ошибки ValueError
-    try:
-        create_booking(event_id=999, user_id=101)
-    except ValueError:
-        pass
-
-    # Пример ошибки KeyError
-    try:
-        get_booking("non_existing_id")
-    except KeyError:
-        pass
